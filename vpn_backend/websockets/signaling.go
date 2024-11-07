@@ -1,10 +1,10 @@
 package websockets
 
 import (
+	"github.com/gorilla/websocket"
 	"log"
 	"sync"
-
-	"github.com/gorilla/websocket"
+	"vpn-backend/config" // Import your config package to access RTCConfiguration
 )
 
 // Peer stores the connection and ID of each peer
@@ -71,6 +71,19 @@ func (s *SignalingServer) HandleSignaling(peerID string, conn *websocket.Conn) {
 
 	s.AddPeer(peerID, conn)
 
+	// Prepare the message that will include TURN/STUN info
+	turnStunConfig := config.RTCConfiguration.ICEServers
+
+	// Send the TURN/STUN configuration to the peer when they first connect
+	initialMessage := map[string]interface{}{
+		"type":       "config",
+		"iceServers": turnStunConfig,
+	}
+	if err := conn.WriteJSON(initialMessage); err != nil {
+		log.Printf("Error sending TURN/STUN config to %s: %v", peerID, err)
+	}
+
+	// Handle further signaling messages (offer, answer, ICE candidates)
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
@@ -79,6 +92,14 @@ func (s *SignalingServer) HandleSignaling(peerID string, conn *websocket.Conn) {
 		}
 
 		log.Printf("Message from %s: %s", peerID, message)
-		s.BroadcastMessage(peerID, message)
+
+		// Include TURN/STUN config in the signaling message
+		messageWithConfig := map[string]interface{}{
+			"message":    string(message),
+			"iceServers": turnStunConfig,
+		}
+
+		// Broadcast the message to all other peers
+		s.BroadcastMessage(peerID, messageWithConfig)
 	}
 }
