@@ -1,27 +1,37 @@
 package services
 
 import (
-	"errors"
+	"crypto/rand"
+	"encoding/hex"
+	"time"
+	"vpn_backend/config"
 	"vpn_backend/models"
 )
 
-var vpnSessions = make(map[string]models.VPNSession) // Simple in-memory storage
-
-func CreateVPN(vpn models.VPNSession) (string, error) {
-	if _, exists := vpnSessions[vpn.SessionID]; exists {
-		return "", errors.New("session already exists")
-	}
-	vpnSessions[vpn.SessionID] = vpn
-	return vpn.SessionID, nil
+type VPNService struct {
+	signalingServer *websockets.SignalingServer
 }
 
-func JoinVPN(sessionID, peerID string) error {
-	session, exists := vpnSessions[sessionID]
-	if !exists {
-		return errors.New("session not found")
+func NewVPNService(server *websockets.SignalingServer) *VPNService {
+	return &VPNService{
+		signalingServer: server,
+	}
+}
+
+func (s *VPNService) CreateSession() (*models.VPNSession, error) {
+	sessionID := generateSessionID()
+	session := &models.VPNSession{
+		SessionID:   sessionID,
+		CreatedAt:   time.Now(),
+		Peers:       make([]models.Peer, 0),
+		IsEncrypted: true,
 	}
 
-	session.Peers = append(session.Peers, models.Peer{PeerID: peerID, IsActive: true})
-	vpnSessions[sessionID] = session
-	return nil
+	return session, nil
+}
+
+func generateSessionID() string {
+	bytes := make([]byte, 16)
+	rand.Read(bytes)
+	return hex.EncodeToString(bytes)
 }

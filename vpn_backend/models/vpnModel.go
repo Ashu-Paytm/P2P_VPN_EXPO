@@ -1,19 +1,27 @@
 package models
 
-// JoinVPNRequest represents a request to join a VPN session
-type JoinVPNRequest struct {
-	SessionID string
-	PeerID    string
-}
+import (
+	"time"
+)
 
-// Peer represents a single peer in the VPN session
 type Peer struct {
-	PeerID   string
-	IsActive bool
+	PeerID   string    `json:"peer_id"`
+	IsActive bool      `json:"is_active"`
+	JoinedAt time.Time `json:"joined_at"`
+	LastSeen time.Time `json:"last_seen"`
 }
 
-// VPNSession represents a peer-hosted VPN session
 type VPNSession struct {
-	SessionID string
-	Peers     []Peer
+	SessionID   string    `json:"session_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Peers       []Peer    `json:"peers"`
+	IsEncrypted bool      `json:"is_encrypted"`
+}
+
+type SignalingMessage struct {
+	Type      string          `json:"type"`
+	From      string          `json:"from"`
+	To        string          `json:"to"`
+	Payload   json.RawMessage `json:"payload"`
+	SessionID string          `json:"session_id"`
 }
