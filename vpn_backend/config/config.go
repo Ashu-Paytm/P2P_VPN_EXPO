@@ -32,10 +32,11 @@ func LoadConfig() {
 	}
 
 	// Override with environment variables if present
-	AppConfig.ServerPort = getEnv("SERVER_PORT", AppConfig.ServerPort)
-	if AppConfig.ServerPort == "" {
-		AppConfig.ServerPort = "8080"
-	}
+	AppConfig.ServerPort = "8080"
+	// AppConfig.ServerPort = getEnv("SERVER_PORT", AppConfig.ServerPort)
+	// if AppConfig.ServerPort == "" {
+	// 	AppConfig.ServerPort = "8080"
+	// }
 
 	// Set default STUN server if none configured
 	if len(AppConfig.ICEServers) == 0 {
@@ -46,8 +47,9 @@ func LoadConfig() {
 		}
 	}
 
-	AppConfig.EncryptionKey = getEnv("ENCRYPTION_KEY", AppConfig.EncryptionKey)
-	if AppConfig.EncryptionKey == "" {
-		log.Fatal("ENCRYPTION_KEY must be set")
-	}
+	AppConfig.EncryptionKey = "asjdfiosersep"
+	// AppConfig.EncryptionKey = getEnv("ENCRYPTION_KEY", AppConfig.EncryptionKey)
+	// if AppConfig.EncryptionKey == "" {
+	// 	log.Fatal("ENCRYPTION_KEY must be set")
+	// }
 }

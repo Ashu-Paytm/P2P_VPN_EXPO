@@ -3,9 +3,11 @@ package services
 import (
 	"crypto/rand"
 	"encoding/hex"
+	// "os"
 	"time"
-	"vpn_backend/config"
+	// "vpn_backend/config"
 	"vpn_backend/models"
+	"vpn_backend/signaling"
 )
 
 type VPNService struct {

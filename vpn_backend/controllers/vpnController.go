@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"vpn_backend/models"
 	"vpn_backend/websockets"
 )
